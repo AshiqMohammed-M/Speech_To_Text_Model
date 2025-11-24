@@ -100,7 +100,7 @@ def get_dataset(
         num_examples=None,
         num_workers=4,
 ):
-    # Load Common Voice dataset from local file
+    # Load Common Voice dataset from huggingface
     dataset = datasets.load_dataset(
     "m-aliabbas/idrak_timit_subsample1",
     split="train",

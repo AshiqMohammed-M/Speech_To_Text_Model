@@ -1,6 +1,6 @@
 import random
 
-import torchaudio
+# import torchaudio
 import datasets
 import torch
 from torch.utils.data import Dataset, DataLoader
@@ -8,13 +8,24 @@ import torch.nn.functional as F
 from tokenizers import Tokenizer, models, trainers, pre_tokenizers, decoders
 from tokenizers.processors import TemplateProcessing
 from pathlib import Path
-import sounddevice as sd
-import os, sys
+# import sounddevice as sd
+import os, sys, platform, subprocess
+import torchcodec
 
-ffmpeg_dll_dir = Path(r"D:\Downloads\ffmpeg-7.1.1-full_build-shared\ffmpeg-7.1.1-full_build-shared\bin")  # adjust if your conda root differs
-assert ffmpeg_dll_dir.exists(), ffmpeg_dll_dir
-os.add_dll_directory(str(ffmpeg_dll_dir))  # Python 3.8+ DLL search
-
+requested_profile = os.getenv("STT_PROFILE", "auto").strip().lower()
+if requested_profile == "cuda" and not torch.cuda.is_available():
+    active_profile = "cpu"
+    print("STT_PROFILE=cuda requested, but CUDA is unavailable. Switched to CPU profile.")
+elif requested_profile == "cpu":
+    active_profile = "cpu"
+elif requested_profile == "mps" and torch.backends.mps.is_available():
+    active_profile = "mps"
+elif requested_profile == "mps":
+    active_profile = "cpu"
+    print("STT_PROFILE=mps requested, but MPS is unavailable. Switched to CPU profile.")
+else:
+    active_profile = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+os.environ["STT_PROFILE"] = active_profile
 
 def collate_fn(batch):
     # Get max audio length

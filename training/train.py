@@ -93,7 +93,7 @@ def preview_batch_predictions(
     return render_table(rows)
 
 def main():
-    log_dir = Path("runs") / "speech_to_text" / model_id
+    log_dir = Path("training/runs") / "speech_to_text" / model_id
     if log_dir.exists():
         shutil.rmtree(log_dir)
     writer = SummaryWriter(log_dir.as_posix())
@@ -110,7 +110,7 @@ def main():
     )
     print(f"Using device: {device}")
 
-    checkpoint_dir = Path("models") / model_id
+    checkpoint_dir = Path("training/models") / model_id
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     latest_path = checkpoint_dir / "model_latest.pth"
     best_path = checkpoint_dir / "model_best.pth"
